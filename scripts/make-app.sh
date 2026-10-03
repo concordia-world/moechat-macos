@@ -25,6 +25,13 @@ rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN_DIR/Moechat" "$APP/Contents/MacOS/Moechat"
 
+# app 图标。缺了也只是没有图标，不算致命，所以给警告而不是报错退出。
+if [ -f "$ROOT/Resources/AppIcon.icns" ]; then
+    cp "$ROOT/Resources/AppIcon.icns" "$APP/Contents/Resources/AppIcon.icns"
+else
+    echo "警告：$ROOT/Resources/AppIcon.icns 不存在，app 将没有图标" >&2
+fi
+
 # 子应用产物。宿主不内置子应用源码，只把它构建好的 dist 搬进来——与 Android 侧
 # 的 syncSubApps 同一策略。缺了就直接报错退出并说清该跑哪条命令，
 # 不留「打开是 404」这种无头绪的失败。
@@ -46,6 +53,7 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
     <key>CFBundleDisplayName</key><string>moechat</string>
     <key>CFBundleIdentifier</key><string>ai.moechat.macos</string>
     <key>CFBundleExecutable</key><string>Moechat</string>
+    <key>CFBundleIconFile</key><string>AppIcon</string>
     <key>CFBundlePackageType</key><string>APPL</string>
     <key>CFBundleShortVersionString</key><string>0.1.0</string>
     <key>CFBundleVersion</key><string>1</string>
