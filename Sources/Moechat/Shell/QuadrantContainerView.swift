@@ -11,8 +11,8 @@ struct QuadrantContainerView: View {
 
     @Environment(\.catalog) private var catalog
 
-    /// 收起态尺寸：底栏里的一格。
-    private let collapsedSize = CGSize(width: 84, height: 108)
+    /// 收起态尺寸：**方形**，对齐系统底栏的图标。取值见 Theme.collapsedSize。
+    private let collapsedSize = CGSize(width: Theme.collapsedSize, height: Theme.collapsedSize)
 
     /// 展开态的格子与间距。
     private let cellSize: CGFloat = 68
@@ -76,31 +76,31 @@ struct QuadrantContainerView: View {
     /// 与 Android 桌面文件夹同理：文件夹图标本身是内容的缩影。
     private var collapsedContent: some View {
         VStack(spacing: 0) {
+            Spacer(minLength: 0)
             thumbnail
             Spacer(minLength: 0)
-            HStack(spacing: 5) {
-                Circle()
-                    .fill(quadrant.accent)
-                    .frame(width: 5, height: 5)
-                Text(catalog[quadrant.titleKey])
-                    .font(.system(size: 10.5, weight: .medium))
-                    .foregroundStyle(Theme.secondaryText)
-                    // 收起态容器只有 84pt 宽，英文的 "Possessions" 会折成两行并撑出容器。
-                    // 限一行 + 尾部省略，与 Android 侧同一行为。
-                    .lineLimit(1)
-                    .truncationMode(.tail)
-            }
+            // 文字贴着容器底部、**居中**。
+            Text(catalog[quadrant.titleKey])
+                .font(.system(size: 10.5, weight: .medium))
+                // 用象限色。原先文字左边有个同色小圆点，文字居中之后圆点会把居中破坏掉，
+                // 所以去掉圆点、让文字本身承担这个色彩线索（与 Android 侧同一处理）。
+                .foregroundStyle(quadrant.accent)
+                // 容器只有 64pt 宽，英文的 "Possessions" 会折行并撑出容器。
+                // 限一行 + 尾部省略，与 Android 侧同一行为。
+                .lineLimit(1)
+                .truncationMode(.tail)
+                .frame(maxWidth: .infinity)
         }
-        .padding(11)
+        .padding(Theme.collapsedPadding)
     }
 
     /// 缩略图沿用展开态的同一套布局，做到所见即所得。
     private var thumbnail: some View {
         let columns = gridColumns
         let rows = gridRows
-        let gap: CGFloat = 5
-        let available = collapsedSize.width - 22
-        let cell = min(26, (available - gap * CGFloat(columns - 1)) / CGFloat(columns))
+        let gap: CGFloat = 3
+        let available = collapsedSize.width - Theme.collapsedPadding * 2
+        let cell = min(Theme.thumbCell, (available - gap * CGFloat(columns - 1)) / CGFloat(columns))
 
         return Grid(horizontalSpacing: gap, verticalSpacing: gap) {
             ForEach(0..<rows, id: \.self) { row in
