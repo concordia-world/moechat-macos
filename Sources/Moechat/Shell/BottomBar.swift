@@ -16,12 +16,12 @@ struct BottomBar: View {
             if expanded == nil {
                 // 收起：容器之间固定间距 —— 主体容器的宽度由**内容**决定，
                 // 不撑满父级（这正是「宽度不必是父界面的 100%」的落点）
-                HStack(alignment: .center, spacing: Theme.containerGap) {
+                HStack(alignment: .bottom, spacing: Theme.containerGap) {
                     containers
                 }
             } else {
                 // 展开：撑满 + 均分。格子宽了需要空间，也顺势把其余容器挤开。
-                HStack(alignment: .center, spacing: 0) {
+                HStack(alignment: .bottom, spacing: 0) {
                     Spacer(minLength: 0)
                     ForEach(Quadrant.allCases) { quadrant in
                         container(quadrant)
@@ -31,8 +31,13 @@ struct BottomBar: View {
                 .frame(maxWidth: .infinity)
             }
         }
+        // **主体容器的高度固定**：展开的容器向上溢出它，而不是把它撑高。
+        // 撑高会把细长条变成矮胖的圆角矩形 —— 圆角比例（高度的 30%）和整体形状都走样。
+        // SwiftUI 的 .frame(height:) 不裁剪子视图，所以溢出的部分是画得出来的；
+        // alignment: .bottom 让收起态那三个仍贴在底边不动。
+        .frame(height: Theme.barHeight - Theme.barPadding * 2, alignment: .bottom)
         .padding(Theme.barPadding)
-        // 背景只包住长容器本身；外边距在它之外，所以那两层 padding 必须写在后面
+        // 背景只包住主体容器本身；外边距在它之外，所以那两层 padding 必须写在后面
         .background(
             Theme.barSurface,
             in: RoundedRectangle(cornerRadius: Theme.radiusBar)
