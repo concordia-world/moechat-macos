@@ -35,7 +35,7 @@ struct BottomBar: View {
         // 背景只包住长容器本身；外边距在它之外，所以那两层 padding 必须写在后面
         .background(
             Theme.barSurface,
-            in: RoundedRectangle(cornerRadius: Theme.barHeight / 2)
+            in: RoundedRectangle(cornerRadius: Theme.radiusBar)
         )
         // 主体容器在可用宽度里居中；它自己不撑满，所以这里要有一层来托
         .frame(maxWidth: .infinity, alignment: .center)

@@ -26,7 +26,7 @@ enum Theme {
 
     static let shellPadding: CGFloat = 14
 
-    // ── 底栏外层：一个半透明长容器，四个象限容器装在里面 ──
+    // ── 主体容器：一个半透明长条，四个象限容器装在里面 ──
     //
     // 结构与高度都照系统 Dock 来。macOS 的 Dock 图标尺寸是 64（`defaults read
     // com.apple.dock tilesize`），加上下各 11 的内边距就是 86 —— 与从截图量到的
@@ -35,6 +35,11 @@ enum Theme {
     static let barHeight: CGFloat = 86
     static let barPadding: CGFloat = 11
     static let barBottom: CGFloat = 6
+
+    /// 主体容器的圆角。**不是胶囊**（不是高度的一半）——
+    /// macOS Dock 实测圆角约 25pt，占其 86pt 高度的 **29%**；
+    /// X5 底栏量出来也是 30%，两边一致在这个比例上。
+    static let radiusBar: CGFloat = 26
 
     /// 收起态容器：**方形**，边长 = barHeight − 2×barPadding = 64，正好等于 Dock 的 tilesize。
     static let collapsedSize: CGFloat = barHeight - barPadding * 2
