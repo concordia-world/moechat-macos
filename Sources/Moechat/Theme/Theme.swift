@@ -38,6 +38,11 @@ enum Theme {
 
     /// 收起态容器：**方形**，边长 = barHeight − 2×barPadding = 64，正好等于 Dock 的 tilesize。
     static let collapsedSize: CGFloat = barHeight - barPadding * 2
+
+    /// 收起态四个象限容器的间距。macOS Dock 实测**稳定在 16pt**（图标可见宽约 52pt，
+    /// tilesize 是 64 —— 图标素材自带透明边距，所以可见的比 tile 小）。
+    /// Android 侧取的是 24dp，那边系统底栏的间距明显更大。
+    static let containerGap: CGFloat = 16
     static let collapsedPadding: CGFloat = 6
     static let thumbCell: CGFloat = 20
 }
