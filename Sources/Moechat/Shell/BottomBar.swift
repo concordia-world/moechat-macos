@@ -12,35 +12,23 @@ struct BottomBar: View {
     @Binding var activeApp: SubApp?
 
     var body: some View {
-        Group {
-            if expanded == nil {
-                // 收起：容器之间固定间距 —— 主体容器的宽度由**内容**决定，
-                // 不撑满父级（这正是「宽度不必是父界面的 100%」的落点）
-                HStack(alignment: .bottom, spacing: Theme.containerGap) {
-                    containers
-                }
-            } else {
-                // 展开：撑满 + 均分。格子宽了需要空间，也顺势把其余容器挤开。
-                HStack(alignment: .bottom, spacing: 0) {
-                    Spacer(minLength: 0)
-                    ForEach(Quadrant.allCases) { quadrant in
-                        container(quadrant)
-                        Spacer(minLength: 0)
-                    }
-                }
-                .frame(maxWidth: .infinity)
+        HStack(alignment: .bottom, spacing: Theme.containerGap) {
+            ForEach(Quadrant.allCases) { quadrant in
+                container(quadrant)
             }
         }
-        // **主体容器的高度固定**：展开的容器向上溢出它，而不是把它撑高。
-        // 撑高会把细长条变成矮胖的圆角矩形 —— 圆角比例（高度的 30%）和整体形状都走样。
-        // SwiftUI 的 .frame(height:) 不裁剪子视图，所以溢出的部分是画得出来的；
-        // alignment: .bottom 让收起态那三个仍贴在底边不动。
-        .frame(height: Theme.barHeight - Theme.barPadding * 2, alignment: .bottom)
+        // **主体容器贴内容**：收起和展开**同一套排布法则** ——
+        // 它跟着内容变长（宽）变宽（高）。
+        //
+        // 另外两条路都试过，各自坏一处：
+        //   撑满父级 → 收起时四个容器挤在中间、两端空一大片
+        //   高度固定 → 展开的容器从长条上「长出来」，比例突兀
         .padding(Theme.barPadding)
-        // 背景只包住主体容器本身；外边距在它之外，所以那两层 padding 必须写在后面
         .background(
             Theme.barSurface,
-            in: RoundedRectangle(cornerRadius: Theme.radiusBar)
+            // 圆角取**当前高度的 30%**，不是固定值 ——
+            // 容器变高时比例才不会掉（固定 26pt 到 122 高就只剩 21%）。
+            in: RoundedRectangle(cornerRadius: pillRadius)
         )
         // 主体容器在可用宽度里居中；它自己不撑满，所以这里要有一层来托
         .frame(maxWidth: .infinity, alignment: .center)
@@ -49,11 +37,15 @@ struct BottomBar: View {
         .animation(.spring(response: 0.34, dampingFraction: 0.82), value: expanded)
     }
 
-    /// 收起态：四个容器按固定顺序排（间距由外面的 HStack 给）。
-    private var containers: some View {
-        ForEach(Quadrant.allCases) { quadrant in
-            container(quadrant)
-        }
+    /// 容器内容的高度：收起态是方形边长，展开态由格子数算出。
+    private var contentHeight: CGFloat {
+        guard let quadrant = expanded else { return Theme.collapsedSize }
+        return Theme.expandedHeight(rows: quadrant.gridRows)
+    }
+
+    /// 主体容器的圆角 = 当前高度的 30%。容器一变高，比例跟着走。
+    private var pillRadius: CGFloat {
+        (contentHeight + Theme.barPadding * 2) * Theme.radiusBarRatio
     }
 
     private func container(_ quadrant: Quadrant) -> some View {

@@ -19,12 +19,11 @@ struct QuadrantContainerView: View {
     private let cellGap: CGFloat = 8
     private let expansionPadding: CGFloat = 16
 
-    /// 网格形状由内容量决定：最多 3 列，行数按需计算。
+    /// 网格形状由内容量决定。算法在 Quadrant 上（底栏算主体容器高度时也要用），
+    /// 这里只是转发，避免两处各算一遍算岔。
     private var appCount: Int { quadrant.apps.count }
-    private var gridColumns: Int { min(3, max(1, appCount)) }
-    private var gridRows: Int {
-        Int(ceil(Double(appCount) / Double(gridColumns)))
-    }
+    private var gridColumns: Int { quadrant.gridColumns }
+    private var gridRows: Int { quadrant.gridRows }
 
     /// 展开尺寸由内容决定——内容少就小，只有装满 3×3 时才达到 3 倍。
     private var expandedSize: CGSize {

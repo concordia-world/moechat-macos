@@ -36,10 +36,23 @@ enum Theme {
     static let barPadding: CGFloat = 11
     static let barBottom: CGFloat = 6
 
-    /// 主体容器的圆角。**不是胶囊**（不是高度的一半）——
-    /// macOS Dock 实测圆角约 25pt，占其 86pt 高度的 **29%**；
-    /// X5 底栏量出来也是 30%，两边一致在这个比例上。
-    static let radiusBar: CGFloat = 26
+    /// 主体容器的圆角**比例**（相对自身高度）。
+    ///
+    /// **写比例不写绝对值**：容器展开时会跟着内容变高，圆角若固定 26pt，
+    /// 高度到 122 时比例就掉到 21%，形状立刻不对。恒定 30% 才等价于「同一个东西变大了」。
+    ///
+    /// 30% 是实测值：macOS Dock 圆角约 25pt 占其 86pt 高度的 29%，
+    /// X5 底栏量出来 30%。两端一致在这个比例上。
+    static let radiusBarRatio: CGFloat = 0.30
+
+    /// 展开态：格子、间距、内边距。底栏算主体容器高度时要用。
+    static let cellSize: CGFloat = 68
+    static let cellGap: CGFloat = 8
+    static let expansionPadding: CGFloat = 16
+
+    static func expandedHeight(rows: Int) -> CGFloat {
+        CGFloat(rows) * cellSize + CGFloat(rows - 1) * cellGap + expansionPadding * 2
+    }
 
     /// 收起态容器：**方形**，边长 = barHeight − 2×barPadding = 64，正好等于 Dock 的 tilesize。
     static let collapsedSize: CGFloat = barHeight - barPadding * 2

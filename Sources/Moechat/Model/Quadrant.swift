@@ -46,6 +46,11 @@ enum Quadrant: Int, CaseIterable, Identifiable {
     }
 
     var defaultApp: SubApp { apps[0] }
+
+    /// 网格形状由内容量决定：最多 3 列，行数按需计算。
+    /// 放在这里而不是视图里，因为底栏算主体容器高度时也要用。
+    var gridColumns: Int { min(3, max(1, apps.count)) }
+    var gridRows: Int { Int(ceil(Double(apps.count) / Double(gridColumns))) }
 }
 
 /// 子应用。它是一个 Web 应用，跑在宿主的 WebAppContainer 里。
